@@ -6,3 +6,85 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Teacher {
+  id                 Int                  @id @default(autoincrement())
+  name               String               @unique
+  teacherDisciplines TeachersDiscipline[]
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+
+  @@map("teachers")
+}
+
+model Term {
+  id          Int          @id @default(autoincrement())
+  number      Int          @unique
+  disciplines Discipline[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@map("terms")
+}
+
+model Discipline {
+  id                 Int                  @id @default(autoincrement())
+  name               String               @unique
+  termId             Int
+  teachersDiscipline TeachersDiscipline[]
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+
+  term Term @relation(fields: [termId], references: [id])
+
+  @@map("disciplines")
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  tests     Test[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("categories")
+}
+
+model Test {
+  id                  Int      @id @default(autoincrement())
+  name                String
+  pdfUrl              String
+  categoryId          Int
+  teacherDisciplineId Int
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  category          Category           @relation(fields: [categoryId], references: [id])
+  teacherDiscipline TeachersDiscipline @relation(fields: [teacherDisciplineId], references: [id])
+
+  @@map("tests")
+}
+
+model TeachersDiscipline {
+  id           Int      @id @default(autoincrement())
+  teacherId    Int
+  disciplineId Int
+  tests        Test[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  teacher    Teacher    @relation(fields: [teacherId], references: [id])
+  discipline Discipline @relation(fields: [disciplineId], references: [id])
+
+  @@map("teachers_disciplines")
+}
