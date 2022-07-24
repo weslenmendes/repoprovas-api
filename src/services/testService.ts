@@ -71,6 +71,20 @@ async function createTest(test: ICreateTestExtended): Promise<any> {
   await testRepository.insertTest(newTest);
 }
 
+async function getAllTestsByDiscipline() {
+  const tests = await testRepository.getAllTestsByTermAndDiscipline();
+
+  return tests;
+}
+
+async function getAllTestsByTeacher() {
+  const tests = await testRepository.getAllTestsByTeacher();
+
+  return tests;
+}
+
 export default {
   createTest,
+  getAllTestsByDiscipline,
+  getAllTestsByTeacher,
 };

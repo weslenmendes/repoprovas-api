@@ -8,11 +8,58 @@ async function insertTest(test: ICreateTest) {
   });
 }
 
-// async function getAllTests(): Promise<ITest[]> {
-//   const tests = await prisma.test.findMany();
-//   return tests;
-// }
+async function getAllTestsByTermAndDiscipline() {
+  const tests = await prisma.term.findMany({
+    select: {
+      id: true,
+      number: true,
+      disciplines: {
+        select: {
+          id: true,
+          name: true,
+          term: {},
+          teachersDiscipline: {
+            select: {
+              id: true,
+              discipline: {},
+              teacher: {
+                select: { id: true, name: true },
+              },
+              tests: {
+                select: { id: true, name: true, pdfUrl: true, category: {} },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return tests;
+}
+
+async function getAllTestsByTeacher() {
+  const tests = await prisma.teachersDiscipline.findMany({
+    include: {
+      discipline: {
+        include: {
+          term: {},
+        },
+      },
+      teacher: {},
+      tests: {
+        include: {
+          category: {},
+        },
+      },
+    },
+  });
+
+  return tests;
+}
 
 export default {
   insertTest,
+  getAllTestsByTermAndDiscipline,
+  getAllTestsByTeacher,
 };
