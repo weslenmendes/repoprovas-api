@@ -3,6 +3,9 @@ import disciplineRepository from '../repositories/disciplineRepository.js';
 import teacherRepository from '../repositories/teacherRepository.js';
 import teacherDisciplineRepository from '../repositories/teacherDisciplineRepository.js';
 import categoryRepository from '../repositories/categoryRepository.js';
+import userRepository from '../repositories/userRepository.js';
+
+import emailService from './emailService.js';
 
 import testFactory from './factories/testFactory.js';
 import { ICreateTestExtended } from '../interfaces/testInterface.js';
@@ -14,61 +17,75 @@ async function checkIfExists(value: string | number, repositoryName: TRepository
   const isValueId = Number.isNaN(Number(value)) ? { id: false, name: true } : { id: true, name: false };
 
   if (repositoryName === 'teacher') {
-    return isValueId.id
-      ? (await teacherRepository.getTeacherById(+value))?.id
-      : (await teacherRepository.getTeacherByName(String(value)))?.id;
+    return isValueId.id ? teacherRepository.getTeacherById(+value) : teacherRepository.getTeacherByName(String(value));
   }
 
   if (repositoryName === 'discipline') {
     return isValueId.id
-      ? (await disciplineRepository.getDisciplineById(+value))?.id
-      : (await disciplineRepository.getDisciplineByName(String(value)))?.id;
+      ? disciplineRepository.getDisciplineById(+value)
+      : disciplineRepository.getDisciplineByName(String(value));
   }
 
   if (repositoryName === 'category') {
     return isValueId.id
-      ? (await categoryRepository.getCategoryById(+value))?.id
-      : (await categoryRepository.getCategoryByName(String(value)))?.id;
+      ? categoryRepository.getCategoryById(+value)
+      : categoryRepository.getCategoryByName(String(value));
   }
 
   return null;
 }
 
+async function sendAEmailToAllUsers(nameOfTest: string) {
+  const allUsers = await userRepository.getAllUsers();
+
+  const allUsersEmails = allUsers.map((user) => user.email);
+
+  const promises = allUsersEmails.map((email) => emailService.sendEmail(email, nameOfTest));
+
+  await Promise.all(promises);
+}
+
 async function createTest(test: ICreateTestExtended): Promise<any> {
   const { teacher, discipline } = test;
 
-  const teacherId = await checkIfExists(teacher, 'teacher');
+  const teacherFinded = await checkIfExists(teacher, 'teacher');
 
-  if (!teacherId) {
+  if (!teacherFinded) {
     throw generateError({ type: 'NotFoundError', message: 'Teacher not found.' });
   }
 
-  const disciplineId = await checkIfExists(discipline, 'discipline');
+  const disciplineFinded = await checkIfExists(discipline, 'discipline');
 
-  if (!disciplineId) {
+  if (!disciplineFinded) {
     throw generateError({ type: 'NotFoundError', message: 'Discipline not found.' });
   }
 
   const isTeacherTeachesDiscipline = await teacherDisciplineRepository.getByTeacherIdAndDisciplineId(
-    teacherId,
-    disciplineId
+    teacherFinded.id,
+    disciplineFinded.id
   );
 
   if (!isTeacherTeachesDiscipline) {
     throw generateError({ type: 'NotFoundError', message: 'Teacher does not teach this discipline.' });
   }
 
-  const categoryId = await checkIfExists(test.category, 'category');
+  const categoryFinded = await checkIfExists(test.category, 'category');
 
-  if (!categoryId) {
+  if (!categoryFinded) {
     throw generateError({ type: 'NotFoundError', message: 'Category not found.' });
   }
 
   const teacherDisciplineId = isTeacherTeachesDiscipline.id;
 
-  const newTest = testFactory.createANewTest(test, categoryId, teacherDisciplineId);
+  const newTest = testFactory.createANewTest(test, categoryFinded.id, teacherDisciplineId);
 
   await testRepository.insertTest(newTest);
+
+  const nameOfTest = `${teacherFinded.name} ${categoryFinded.name} ${new Date().getFullYear()} - ${test.name} (${
+    disciplineFinded.name
+  })`;
+
+  sendAEmailToAllUsers(nameOfTest);
 }
 
 async function getAllTestsByOrderBy(orderBy: string) {

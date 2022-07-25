@@ -31,8 +31,20 @@ async function getUserByEmail(email: string): Promise<IUser> {
   return user;
 }
 
+async function getAllUsers() {
+  const users = await prisma.user.findMany({
+    select: {
+      id: true,
+      email: true,
+    },
+  });
+
+  return users;
+}
+
 export default {
   insertUser,
   getUserById,
   getUserByEmail,
+  getAllUsers,
 };

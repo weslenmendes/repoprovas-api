@@ -26,6 +26,7 @@
   "homepage": "https://github.com/weslenmendes/repoprovas-api#readme",
   "dependencies": {
     "@prisma/client": "^4.1.0",
+    "@sendgrid/mail": "^7.7.0",
     "bcrypt": "^5.0.1",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
