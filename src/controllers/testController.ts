@@ -11,14 +11,10 @@ export async function addTest(req: Request, res: Response) {
   res.status(201).send({ message: 'Test created.' });
 }
 
-export async function getTestsByDiscipline(_req: Request, res: Response) {
-  const tests = await testService.getAllTestsByDiscipline();
+export async function getTests(req: Request, res: Response) {
+  const { orderBy } = req.query;
 
-  res.send(tests);
-}
-
-export async function getTermsByTeacher(_req: Request, res: Response) {
-  const tests = await testService.getAllTestsByTeacher();
+  const tests = await testService.getAllTestsByOrderBy(orderBy as string);
 
   res.send(tests);
 }

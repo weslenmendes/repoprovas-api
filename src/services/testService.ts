@@ -71,20 +71,21 @@ async function createTest(test: ICreateTestExtended): Promise<any> {
   await testRepository.insertTest(newTest);
 }
 
-async function getAllTestsByDiscipline() {
-  const tests = await testRepository.getAllTestsByTermAndDiscipline();
+async function getAllTestsByOrderBy(orderBy: string) {
+  let tests = null;
 
-  return tests;
-}
+  if (orderBy === 'discipline') {
+    tests = await testRepository.getAllTestsByTermAndDiscipline();
+  }
 
-async function getAllTestsByTeacher() {
-  const tests = await testRepository.getAllTestsByTeacher();
+  if (orderBy === 'teacher') {
+    tests = await testRepository.getAllTestsByTeacher();
+  }
 
   return tests;
 }
 
 export default {
   createTest,
-  getAllTestsByDiscipline,
-  getAllTestsByTeacher,
+  getAllTestsByOrderBy,
 };

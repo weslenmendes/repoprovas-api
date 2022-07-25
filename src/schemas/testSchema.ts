@@ -3,7 +3,7 @@ import Joi from 'joi';
 import { ISchema } from '../interfaces/schemaInterface.js';
 import { regex } from '../utils/constantsUtils.js';
 
-const testSchema: ISchema = {
+export const testSchema: ISchema = {
   schema: Joi.object().keys({
     name: Joi.string().min(3).pattern(regex.NAME).required().messages({
       'string.empty': '"name" is required.',
@@ -31,4 +31,13 @@ const testSchema: ISchema = {
   local: 'body',
 };
 
-export default testSchema;
+export const testQuerySchema: ISchema = {
+  schema: Joi.object().keys({
+    orderBy: Joi.string().valid('discipline', 'teacher').required().messages({
+      'string.empty': '"orderBy" is required.',
+      'string.required': '"orderBy" is required.',
+      'string.valid': '"orderBy" must be "discipline" or "teacher".',
+    }),
+  }),
+  local: 'query',
+};
