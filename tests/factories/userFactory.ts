@@ -13,6 +13,12 @@ export const newUser = () => {
   };
 };
 
+export const newUserDefault = () => ({
+  email: 'example@gmail.com',
+  password: 'example123',
+  confirmPassword: 'example123',
+});
+
 export const newUserWithInvalidPassword = () => {
   const EMAIL = faker.internet.email();
   const PASSWORD = faker.internet.password(MIN_PASSWORD_LENGTH - 1);
@@ -77,6 +83,6 @@ export const userWithIncorrectPassword = (correctEmail: string) => ({
 });
 
 export const userWithEmailDoesNotExist = () => ({
-  email: 'umusuariocomemaildesses@gmail.com',
+  email: 'example33@gmail.com',
   password: faker.internet.password(MIN_PASSWORD_LENGTH),
 });

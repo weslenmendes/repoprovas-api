@@ -8,7 +8,7 @@ const main = async () => {
   const user = [
     {
       email: 'example@gmail.com',
-      password: encrypt('example'),
+      password: encrypt('example123'),
     },
   ];
 
