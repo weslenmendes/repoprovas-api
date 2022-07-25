@@ -11,7 +11,7 @@
     "build": "tsc",
     "start": "node ./dist/server.js",
     "dev": "nodemon ./src/server.ts",
-    "test": "dotenv -e .env.test prisma migrate reset --force && cross-env NODE_OPTIONS=--experimental-vm-modules dotenv -e .env.test jest -i"
+    "test": "dotenv -e .env.test echo y prisma migrate reset --force && cross-env NODE_OPTIONS=--experimental-vm-modules dotenv -e .env.test jest -i"
   },
   "repository": {
     "type": "git",
